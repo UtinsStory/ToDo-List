@@ -9,5 +9,11 @@ import Foundation
 
 final class ToDoListViewModel {
     
-    var tasks: [String] = []
+    var tasks: [ToDoModel] = []
+    var mockTodo = ToDoModel(
+        id: 1,
+        todo: "Сходить в спортзал",
+        completed: false, userId: 1
+    )
+    
 }

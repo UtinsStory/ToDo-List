@@ -151,7 +151,7 @@ extension ToDoListViewController: UITableViewDataSource {
         ) as? ToDoListTableViewCell else {
             return UITableViewCell()
         }
-        
+        cell.configure(with: viewModel.mockTodo)
         
         return cell
     }
