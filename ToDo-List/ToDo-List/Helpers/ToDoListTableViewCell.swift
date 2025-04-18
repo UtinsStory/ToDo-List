@@ -11,8 +11,6 @@ final class ToDoListTableViewCell: UITableViewCell {
     
     static let reuseIdentifier = "ToDoListTableViewCell"
     
-    var isCompleted: Bool = false
-    
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 16, weight: .medium)
@@ -59,9 +57,10 @@ final class ToDoListTableViewCell: UITableViewCell {
     }
     
     func configure(with model: ToDoModel) {
-        
+        titleLabel.text = model.todo
         taskLabel.text = model.todo
-        isCompleted = model.completed
+        taskCompletionMark.image = UIImage(systemName: model.completed ? "checkmark.circle" : "circle")
+        taskCompletionMark.tintColor = model.completed ? .yellow : .gray
     }
     
     private func setupView() {
@@ -83,12 +82,17 @@ final class ToDoListTableViewCell: UITableViewCell {
             
             titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
             titleLabel.leadingAnchor.constraint(equalTo: taskCompletionMark.trailingAnchor, constant: 8),
+            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
             taskLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 6),
             taskLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
+            taskLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
             
             dateLabel.topAnchor.constraint(equalTo: taskLabel.bottomAnchor, constant: 6),
-            dateLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor)
+            dateLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
+            dateLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
+            dateLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12)
         ])
+        backgroundColor = .black
     }
 }

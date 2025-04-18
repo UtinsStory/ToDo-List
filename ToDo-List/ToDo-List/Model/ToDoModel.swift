@@ -20,10 +20,3 @@ struct ToDoModel: Codable {
         case userId
     }
 }
-
-struct TodoResponse: Codable {
-    let todos: [ToDoModel]
-    let total: Int
-    let skip: Int
-    let limit: Int
-}

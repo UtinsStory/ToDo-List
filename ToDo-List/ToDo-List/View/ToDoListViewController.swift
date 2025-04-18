@@ -73,13 +73,8 @@ final class ToDoListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
-        tableView.reloadData()
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        print("FooterView frame: \(footerView.frame)")
-        print("SafeAreaInsets bottom: \(view.safeAreaInsets.bottom)")
+        setupNotifications()
+        footerView.configure(taskCount: viewModel.tasks.count)
     }
     
     private func setupView() {
@@ -122,6 +117,22 @@ final class ToDoListViewController: UIViewController {
         ])
     }
     
+    private func setupNotifications() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(tasksUpdated),
+            name: .tasksUpdated,
+            object: nil
+        )
+    }
+    
+    @objc private func tasksUpdated() {
+        DispatchQueue.main.async {
+            self.footerView.configure(taskCount: self.viewModel.tasks.count)
+            self.tableView.reloadData()
+        }
+    }
+    
     private func editButtonTapped() {
         
     }
@@ -151,9 +162,22 @@ extension ToDoListViewController: UITableViewDataSource {
         ) as? ToDoListTableViewCell else {
             return UITableViewCell()
         }
-        cell.configure(with: viewModel.mockTodo)
+        let task = viewModel.tasks[indexPath.row]
+        cell.configure(with: task)
         
         return cell
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        let scrollViewHeight = scrollView.frame.size.height
+        
+        if offsetY > contentHeight - scrollViewHeight - 100 {
+            Task {
+                await viewModel.fetchMoreTasks()
+            }
+        }
     }
     
 }
@@ -164,7 +188,7 @@ extension ToDoListViewController: UITableViewDelegate {
         _ tableView: UITableView,
         heightForRowAt indexPath: IndexPath
     ) -> CGFloat {
-        return 44
+        80
     }
 }
 
@@ -172,6 +196,13 @@ extension ToDoListViewController: UITableViewDelegate {
 extension ToDoListViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBar.resignFirstResponder()
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        viewModel.tasks = searchText.isEmpty ? viewModel.tasks : viewModel.tasks.filter {
+            $0.todo.lowercased().contains(searchText.lowercased())
+        }
+        tableView.reloadData()
     }
 }
 
