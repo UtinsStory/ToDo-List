@@ -234,6 +234,36 @@ extension ToDoListViewController: UITableViewDelegate {
     ) -> CGFloat {
         80
     }
+    
+    func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+         let task = viewModel.tasks[indexPath.row]
+         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
+             let editAction = UIAction(
+                title: "Редактировать",
+                image: UIImage(resource: .iconEdit)
+             ) { _ in
+                 self.showErrorAlert(message: "Редактирование задачи \(task.id) пока не реализовано")
+             }
+             
+             let shareAction = UIAction(
+                title: "Поделиться",
+                image: UIImage(resource: .iconExport)
+             ) { _ in
+                 let activityController = UIActivityViewController(activityItems: [task.todo], applicationActivities: nil)
+                 self.present(activityController, animated: true)
+             }
+             
+             let deleteAction = UIAction(
+                title: "Удалить",
+                image: UIImage(resource: .iconTrash),
+                attributes: .destructive
+             ) { _ in
+                 self.viewModel.deleteTask(at: indexPath.row)
+             }
+             
+             return UIMenu(title: "", children: [editAction, shareAction, deleteAction])
+         }
+     }
 }
 
 // MARK: - UISearchBarDelegate

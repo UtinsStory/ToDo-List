@@ -57,6 +57,17 @@ final class ToDoListViewModel {
             userInfo: ["index": index]
         )
     }
+    
+    func deleteTask(at index: Int) {
+        guard index < tasks.count else {
+            print("Ошибка: некорректный индекс \(index)")
+            return
+        }
+        let taskId = tasks[index].id
+        print("Локальное удаление задачи: index=\(index), id=\(taskId)")
+        tasks.remove(at: index)
+        NotificationCenter.default.post(name: .tasksUpdated, object: nil)
+    }
 }
 
 extension Notification.Name {
