@@ -9,9 +9,9 @@ import Foundation
 
 struct ToDoModel: Codable {
     let id: Int
-    let todo: String
-    let completed: Bool
-    let userId: Int
+    var todo: String
+    var completed: Bool
+    var userId: Int
     
     enum CodingKeys: String, CodingKey {
         case id

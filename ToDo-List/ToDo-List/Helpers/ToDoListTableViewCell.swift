@@ -11,6 +11,9 @@ final class ToDoListTableViewCell: UITableViewCell {
     
     static let reuseIdentifier = "ToDoListTableViewCell"
     
+    // Замыкание для уведомления о смене статуса задачи
+    var onCompletionToggled: ((Bool) -> Void)?
+    
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 16, weight: .medium)
@@ -40,11 +43,13 @@ final class ToDoListTableViewCell: UITableViewCell {
         return label
     }()
     
-    private lazy var taskCompletionMark: UIImageView = {
-        let image = UIImageView(image: UIImage(systemName: "circle"))
-        image.tintColor = .gray
+    private lazy var taskCompletionMark: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(systemName: "circle"), for: .normal)
+        button.tintColor = .gray
+        button.addTarget(self, action: #selector(toggleCompletion), for: .touchUpInside)
         
-        return image
+        return button
     }()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -56,11 +61,62 @@ final class ToDoListTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    @objc private func toggleCompletion() {
+        let newCompletionStatus = taskCompletionMark.image(for: .normal) == UIImage(systemName: "circle")
+        onCompletionToggled?(newCompletionStatus)
+    }
+    
     func configure(with model: ToDoModel) {
-        titleLabel.text = model.todo
-        taskLabel.text = model.todo
-        taskCompletionMark.image = UIImage(systemName: model.completed ? "checkmark.circle" : "circle")
+        // Настраиваем кнопку
+        taskCompletionMark.setImage(
+            UIImage(systemName: model.completed ? "checkmark.circle" : "circle"),
+            for: .normal
+        )
         taskCompletionMark.tintColor = model.completed ? .yellow : .gray
+        
+        // Настраиваем текст
+        let titleText = model.todo
+        let taskText = model.todo
+        
+        // Базовые атрибуты
+        let titleAttributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UIColor.white,
+            .font: UIFont.systemFont(ofSize: 16, weight: .medium)
+        ]
+        let taskAttributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UIColor.white,
+            .font: UIFont.systemFont(ofSize: 12, weight: .regular)
+        ]
+        
+        if model.completed {
+            // Перечеркивание для выполненной задачи
+            var completedTitleAttributes = titleAttributes
+            completedTitleAttributes[.strikethroughStyle] = NSUnderlineStyle.single.rawValue
+            completedTitleAttributes[.strikethroughColor] = UIColor.white
+            
+            var completedTaskAttributes = taskAttributes
+            completedTaskAttributes[.strikethroughStyle] = NSUnderlineStyle.single.rawValue
+            completedTaskAttributes[.strikethroughColor] = UIColor.white
+            
+            titleLabel.attributedText = NSAttributedString(
+                string: titleText,
+                attributes: completedTitleAttributes
+            )
+            taskLabel.attributedText = NSAttributedString(
+                string: taskText,
+                attributes: completedTaskAttributes
+            )
+        } else {
+            // Обычный текст без перечеркивания для невыполненной задачи
+            titleLabel.attributedText = NSAttributedString(
+                string: titleText,
+                attributes: titleAttributes
+            )
+            taskLabel.attributedText = NSAttributedString(
+                string: taskText,
+                attributes: taskAttributes
+            )
+        }
     }
     
     private func setupView() {

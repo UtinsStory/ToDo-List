@@ -124,6 +124,12 @@ final class ToDoListViewController: UIViewController {
             name: .tasksUpdated,
             object: nil
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(taskUpdated(_:)),
+            name: .taskUpdated,
+            object: nil
+        )
     }
     
     @objc private func tasksUpdated() {
@@ -133,8 +139,31 @@ final class ToDoListViewController: UIViewController {
         }
     }
     
+    @objc private func taskUpdated(_ notification: Notification) {
+        if let index = notification.userInfo?["index"] as? Int {
+            DispatchQueue.main.async {
+                let indexPath = IndexPath(row: index, section: 0)
+                // Проверяем, видима ли ячейка
+                if self.tableView.indexPathsForVisibleRows?.contains(indexPath) ?? false {
+                    self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                } else {
+                    self.tableView.reloadData()
+                }
+            }
+        } else {
+            print("Ошибка: индекс не передан в уведомлении taskUpdated")
+        }
+    }
+    
     private func editButtonTapped() {
         
+    }
+    
+    // Показ уведомления об ошибке
+    private func showErrorAlert(message: String) {
+        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
     
     func updateTasks() {
@@ -164,6 +193,21 @@ extension ToDoListViewController: UITableViewDataSource {
         }
         let task = viewModel.tasks[indexPath.row]
         cell.configure(with: task)
+        
+        cell.onCompletionToggled = { [weak self] newCompletionStatus in
+            guard let self = self else {
+                return
+            }
+            Task {
+                do {
+                    try await self.viewModel.updateTaskCompletion(at: indexPath.row, completed: newCompletionStatus)
+                } catch {
+                    DispatchQueue.main.async {
+                        self.showErrorAlert(message: "Не удалось обновить задачу: \(error.localizedDescription)")
+                    }
+                }
+            }
+        }
         
         return cell
     }

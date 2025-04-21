@@ -81,7 +81,13 @@ final class ToDoListFooterView: UIView {
     }
     
     func configure(taskCount: Int) {
-        taskCountLabel.text = "\(taskCount) задач"
+        if taskCount == 1 {
+            taskCountLabel.text = "\(taskCount) задача"
+        } else if taskCount <= 4 {
+            taskCountLabel.text = "\(taskCount) задачи"
+        } else {
+            taskCountLabel.text = "\(taskCount) задач"
+        }
     }
     
     

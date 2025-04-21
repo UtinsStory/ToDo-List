@@ -29,23 +29,37 @@ final class ToDoListViewModel {
             // Уведомляем контроллер об обновлении
             NotificationCenter.default.post(name: .tasksUpdated, object: nil)
         } catch {
-            print("Ошибка загрузки задач: \(error)")
+            print("Ошибка загрузки задач: \(error.localizedDescription)")
         }
     }
     
     func fetchMoreTasks() async {
-            do {
-                let skip = tasks.count
-                let newTodos = try await todosService.fetchTodos(skip: skip, limit: 30)
-                self.tasks.append(contentsOf: newTodos)
-                NotificationCenter.default.post(name: .tasksUpdated, object: nil)
-            } catch {
-                print("Ошибка загрузки дополнительных задач: \(error)")
-            }
+        do {
+            let skip = tasks.count
+            let newTodos = try await todosService.fetchTodos(skip: skip, limit: 30)
+            self.tasks.append(contentsOf: newTodos)
+            NotificationCenter.default.post(name: .tasksUpdated, object: nil)
+        } catch {
+            print("Ошибка загрузки дополнительных задач: \(error.localizedDescription)")
         }
+    }
     
+    func updateTaskCompletion(at index: Int, completed: Bool) async throws {
+        guard index < tasks.count else {
+            print("Ошибка: некорректный индекс \(index)")
+            throw TodoServiceError.invalidResponse
+        }
+        let updatedTodo = try await todosService.updateTodo(id: tasks[index].id, completed: completed)
+        tasks[index] = updatedTodo
+        NotificationCenter.default.post(
+            name: .taskUpdated,
+            object: nil,
+            userInfo: ["index": index]
+        )
+    }
 }
 
 extension Notification.Name {
     static let tasksUpdated = Notification.Name("tasksUpdated")
+    static let taskUpdated = Notification.Name("taskUpdated")
 }
