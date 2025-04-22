@@ -9,7 +9,7 @@ import UIKit
 
 final class ToDoListFooterView: UIView {
     
-    var onEditButtonTapped: (() -> Void)?
+    var onAddTodoButtonTapped: (() -> Void)?
     
     private lazy var taskCountLabel: UILabel = {
         let label = UILabel()
@@ -20,13 +20,13 @@ final class ToDoListFooterView: UIView {
         return label
     }()
     
-    private lazy var editButton: UIButton = {
+    private lazy var addTodoButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(systemName: "square.and.pencil"), for: .normal)
         button.tintColor = .yellow
         button.addTarget(
             self,
-            action: #selector(handleEditButtonTapped),
+            action: #selector(handleAddTodoButtonTapped),
             for: .touchUpInside
         )
         
@@ -49,8 +49,8 @@ final class ToDoListFooterView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    @objc private func handleEditButtonTapped() {
-        onEditButtonTapped?()
+    @objc private func handleAddTodoButtonTapped() {
+        onAddTodoButtonTapped?()
     }
     
     private func setupView() {
@@ -58,7 +58,7 @@ final class ToDoListFooterView: UIView {
         [
             separatorView,
             taskCountLabel,
-            editButton
+            addTodoButton
         ].forEach {
             addSubview($0)
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -73,10 +73,10 @@ final class ToDoListFooterView: UIView {
             taskCountLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             taskCountLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
             
-            editButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            editButton.centerYAnchor.constraint(equalTo: centerYAnchor),
-            editButton.widthAnchor.constraint(equalToConstant: 68),
-            editButton.heightAnchor.constraint(equalToConstant: 44)
+            addTodoButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
+            addTodoButton.centerYAnchor.constraint(equalTo: centerYAnchor),
+            addTodoButton.widthAnchor.constraint(equalToConstant: 68),
+            addTodoButton.heightAnchor.constraint(equalToConstant: 44)
         ])
     }
     

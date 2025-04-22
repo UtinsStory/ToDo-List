@@ -64,9 +64,33 @@ final class ToDoListViewModel {
             return
         }
         let taskId = tasks[index].id
-        print("Локальное удаление задачи: index=\(index), id=\(taskId)")
         tasks.remove(at: index)
         NotificationCenter.default.post(name: .tasksUpdated, object: nil)
+    }
+    
+    func addTask(title: String, description: String) async throws {
+        let newTask = try await todosService.addTodo(
+            todo: description,
+            completed: false,
+            userId: 1
+        )
+        tasks.append(newTask)
+        NotificationCenter.default.post(name: .tasksUpdated, object: nil)
+    }
+    
+    func updateTask(at index: Int, title: String, description: String) {
+        guard index < tasks.count else {
+            print("Ошибка: некорректный индекс \(index)")
+            return
+        }
+        let task = tasks[index]
+        tasks[index] = ToDoModel(
+            id: task.id,
+            todo: description,
+            completed: task.completed,
+            userId: task.userId
+        )
+        NotificationCenter.default.post(name: .taskUpdated, object: nil, userInfo: ["index": index])
     }
 }
 

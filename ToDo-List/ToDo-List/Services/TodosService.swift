@@ -92,4 +92,43 @@ final class TodosService: TodosServiceProtocol {
             throw TodoServiceError.decodingError(error)
         }
     }
+    
+    func addTodo(todo: String, completed: Bool, userId: Int) async throws -> ToDoModel {
+        let urlString = "\(baseURL)/add"
+        guard let url = URL(string: urlString) else {
+            throw TodoServiceError.invalidURL
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let body: [String: Any] = [
+            "todo": todo,
+            "completed": completed,
+            "userId": userId
+        ]
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        } catch {
+            print("Ошибка сериализации тела: \(error)")
+            throw TodoServiceError.decodingError(error)
+        }
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 201 else {
+            print("Ошибка ответа POST: status=\((response as? HTTPURLResponse)?.statusCode ?? -1)")
+            throw TodoServiceError.invalidResponse
+        }
+        
+        do {
+            let decoder = JSONDecoder()
+            let newTodo = try decoder.decode(ToDoModel.self, from: data)
+            return newTodo
+        } catch {
+            print("Ошибка декодирования ответа: \(error)")
+            throw TodoServiceError.decodingError(error)
+        }
+    }
 }

@@ -36,7 +36,7 @@ final class ToDoListTableViewCell: UITableViewCell {
         label.textColor = .gray
         
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd.MM.yy"
+        dateFormatter.dateFormat = "dd/MM/yy"
         let dateString = dateFormatter.string(from: Date())
         label.text = dateString
         

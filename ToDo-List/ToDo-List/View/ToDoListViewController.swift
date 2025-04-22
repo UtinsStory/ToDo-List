@@ -47,8 +47,8 @@ final class ToDoListViewController: UIViewController {
         let footer = ToDoListFooterView()
         footer.translatesAutoresizingMaskIntoConstraints = false
         footer.configure(taskCount: viewModel.tasks.count)
-        footer.onEditButtonTapped = { [weak self] in
-            self?.editButtonTapped()
+        footer.onAddTodoButtonTapped = { [weak self] in
+            self?.addTodoButtonTapped()
         }
         
         return footer
@@ -72,6 +72,7 @@ final class ToDoListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.setNavigationBarHidden(true, animated: false)
         setupView()
         setupNotifications()
         footerView.configure(taskCount: viewModel.tasks.count)
@@ -155,8 +156,9 @@ final class ToDoListViewController: UIViewController {
         }
     }
     
-    private func editButtonTapped() {
-        
+    private func addTodoButtonTapped() {
+        let todoVC = ToDoViewController(viewModel: viewModel, screenType: .new)
+        navigationController?.pushViewController(todoVC, animated: true)
     }
     
     // Показ уведомления об ошибке
@@ -235,20 +237,36 @@ extension ToDoListViewController: UITableViewDelegate {
         80
     }
     
+    func tableView(
+        _ tableView: UITableView,
+        didSelectRowAt indexPath: IndexPath
+    ) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let todoVC = ToDoViewController(
+            viewModel: viewModel,
+            screenType: .edit(index: indexPath.row)
+        )
+        navigationController?.pushViewController(todoVC, animated: true)
+    }
+    
     func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-         let task = viewModel.tasks[indexPath.row]
-         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
-             let editAction = UIAction(
+        let task = viewModel.tasks[indexPath.row]
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
+            let editAction = UIAction(
                 title: "Редактировать",
                 image: UIImage(resource: .iconEdit)
-             ) { _ in
-                 self.showErrorAlert(message: "Редактирование задачи \(task.id) пока не реализовано")
-             }
-             
-             let shareAction = UIAction(
+            ) { _ in
+                let todoVC = ToDoViewController(
+                    viewModel: self.viewModel,
+                    screenType: .edit(index: indexPath.row)
+                )
+                self.navigationController?.pushViewController(todoVC, animated: true)
+            }
+            
+            let shareAction = UIAction(
                 title: "Поделиться",
                 image: UIImage(resource: .iconExport)
-             ) { _ in
+            ) { _ in
                  let activityController = UIActivityViewController(activityItems: [task.todo], applicationActivities: nil)
                  self.present(activityController, animated: true)
              }
