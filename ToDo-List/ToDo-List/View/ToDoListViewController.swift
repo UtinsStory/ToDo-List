@@ -10,6 +10,8 @@ import UIKit
 final class ToDoListViewController: UIViewController {
     
     private let viewModel: ToDoListViewModel
+    private var filteredTasks: [ToDoModel] = []
+    private var isSearching = false
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -180,7 +182,7 @@ extension ToDoListViewController: UITableViewDataSource {
         _ tableView: UITableView,
         numberOfRowsInSection section: Int
     ) -> Int {
-        viewModel.tasks.count
+        isSearching ? filteredTasks.count : viewModel.tasks.count
     }
     
     func tableView(
@@ -193,7 +195,7 @@ extension ToDoListViewController: UITableViewDataSource {
         ) as? ToDoListTableViewCell else {
             return UITableViewCell()
         }
-        let task = viewModel.tasks[indexPath.row]
+        let task = isSearching ? filteredTasks[indexPath.row] : viewModel.tasks[indexPath.row]
         cell.configure(with: task)
         
         cell.onCompletionToggled = { [weak self] newCompletionStatus in
@@ -249,7 +251,11 @@ extension ToDoListViewController: UITableViewDelegate {
         navigationController?.pushViewController(todoVC, animated: true)
     }
     
-    func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+    func tableView(
+        _ tableView: UITableView,
+        contextMenuConfigurationForRowAt indexPath: IndexPath,
+        point: CGPoint
+    ) -> UIContextMenuConfiguration? {
         let task = viewModel.tasks[indexPath.row]
         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
             let editAction = UIAction(
@@ -267,21 +273,21 @@ extension ToDoListViewController: UITableViewDelegate {
                 title: "Поделиться",
                 image: UIImage(resource: .iconExport)
             ) { _ in
-                 let activityController = UIActivityViewController(activityItems: [task.todo], applicationActivities: nil)
-                 self.present(activityController, animated: true)
-             }
-             
-             let deleteAction = UIAction(
+                let activityController = UIActivityViewController(activityItems: [task.todo], applicationActivities: nil)
+                self.present(activityController, animated: true)
+            }
+            
+            let deleteAction = UIAction(
                 title: "Удалить",
                 image: UIImage(resource: .iconTrash),
                 attributes: .destructive
-             ) { _ in
-                 self.viewModel.deleteTask(at: indexPath.row)
-             }
-             
-             return UIMenu(title: "", children: [editAction, shareAction, deleteAction])
-         }
-     }
+            ) { _ in
+                self.viewModel.deleteTask(at: indexPath.row)
+            }
+            
+            return UIMenu(title: "", children: [editAction, shareAction, deleteAction])
+        }
+    }
 }
 
 // MARK: - UISearchBarDelegate
@@ -291,8 +297,13 @@ extension ToDoListViewController: UISearchBarDelegate {
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        viewModel.tasks = searchText.isEmpty ? viewModel.tasks : viewModel.tasks.filter {
-            $0.todo.lowercased().contains(searchText.lowercased())
+        if searchText.isEmpty {
+            isSearching = false
+        } else {
+            isSearching = true
+            filteredTasks = viewModel.tasks.filter {
+                $0.todo.lowercased().contains(searchText.lowercased())
+            }
         }
         tableView.reloadData()
     }
