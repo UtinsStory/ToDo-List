@@ -142,11 +142,11 @@ final class ToDoViewController: UIViewController {
         
         switch screenType {
         case .edit(let index):
-            viewModel.updateTask(at: index, title: title, description: description)
+            viewModel.updateTask(at: index, todo: description)
         case .new:
             Task {
                 do {
-                    try await viewModel.addTask(title: title, description: description)
+                    try await viewModel.addTask(todo: description)
                 } catch {
                     print("Ошибка при создании задачи: \(error.localizedDescription)")
                 }
