@@ -10,6 +10,8 @@ import Foundation
 // Протокол для сервиса
 protocol TodosServiceProtocol {
     func fetchTodos(skip: Int, limit: Int) async throws -> [ToDoModel]
+    func addTodo(todo: String, completed: Bool, userId: Int) async throws -> ToDoModel
+    func updateTodo(id: Int, completed: Bool) async throws -> ToDoModel
 }
 
 // Ошибки сервиса

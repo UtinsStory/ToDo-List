@@ -14,7 +14,7 @@ enum ScreenType {
 
 final class ToDoViewController: UIViewController {
     
-    private let viewModel: ToDoListViewModel
+    private let viewModel: ToDoListViewModelProtocol
     
     private var screenType: ScreenType
     
@@ -57,7 +57,7 @@ final class ToDoViewController: UIViewController {
         return textField
     }()
     
-    init(viewModel: ToDoListViewModel, screenType: ScreenType) {
+    init(viewModel: ToDoListViewModelProtocol, screenType: ScreenType) {
         self.viewModel = viewModel
         self.screenType = screenType
         super.init(nibName: nil, bundle: nil)

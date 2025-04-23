@@ -9,14 +9,25 @@ import UIKit
 import CoreData
 
 @MainActor
-final class ToDoListViewModel {
+protocol ToDoListViewModelProtocol {
+    var tasks: [ToDoModel] { get }
     
-    var tasks: [ToDoModel] = []
-    let todosService: TodosService
+    func fetchInitialTasks() async
+    func fetchMoreTasks() async
+    func updateTaskCompletion(at index: Int, completed: Bool) async throws
+    func deleteTask(at index: Int)
+    func addTask(todo: String) async throws
+    func updateTask(at index: Int, todo: String)
+}
+
+final class ToDoListViewModel: ToDoListViewModelProtocol {
+    
+    private(set) var tasks: [ToDoModel] = []
+    let todosService: TodosServiceProtocol
     private let context: NSManagedObjectContext
     private var isFetchingInitialTasks = false // Флаг для предотвращения дублирующих вызовов
     
-    init(todosService: TodosService) {
+    init(todosService: TodosServiceProtocol) {
         self.todosService = todosService
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             fatalError("Не удалось получить AppDelegate")
@@ -49,7 +60,7 @@ final class ToDoListViewModel {
         }
     }
     
-    private func fetchInitialTasks() async {
+    func fetchInitialTasks() async {
         // Предотвращаем дублирующий вызов
         guard !isFetchingInitialTasks else {
             return

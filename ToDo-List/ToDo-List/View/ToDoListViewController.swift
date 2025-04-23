@@ -9,7 +9,7 @@ import UIKit
 
 final class ToDoListViewController: UIViewController {
     
-    private let viewModel: ToDoListViewModel
+    private let viewModel: ToDoListViewModelProtocol
     private var filteredTasks: [ToDoModel] = []
     private var isSearching = false
     
@@ -63,7 +63,7 @@ final class ToDoListViewController: UIViewController {
         return view
     }()
     
-    init(viewModel: ToDoListViewModel) {
+    init(viewModel: ToDoListViewModelProtocol) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
