@@ -12,6 +12,5 @@ Stack: UIKit/CoreData/URLSession/MVVM/Unit-testing
 
 
 ## 🎥 Demo
-![Alt text](https://github.com/UtinsStory/ToDo-List/raw/master/ToDo-List/ToDo-List/Screencast/Simulator%20Screen%20Recording%20-%20iPhone%2016%20Pro%20Max%20-%202025-04-23%20at%2013.17.37.gif)
-
+<img src="https://github.com/UtinsStory/ToDo-List/raw/master/ToDo-List/ToDo-List/Screencast/Simulator%20Screen%20Recording%20-%20iPhone%2016%20Pro%20Max%20-%202025-04-23%20at%2013.17.37.gif" width="197" height="427" />
 
