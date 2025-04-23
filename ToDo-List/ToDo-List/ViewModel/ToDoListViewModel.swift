@@ -22,7 +22,7 @@ protocol ToDoListViewModelProtocol {
 
 final class ToDoListViewModel: ToDoListViewModelProtocol {
     
-    private(set) var tasks: [ToDoModel] = []
+    var tasks: [ToDoModel] = []
     let todosService: TodosServiceProtocol
     private let context: NSManagedObjectContext
     private var isFetchingInitialTasks = false // Флаг для предотвращения дублирующих вызовов
