@@ -197,6 +197,7 @@ extension ToDoListViewController: UITableViewDataSource {
         }
         let task = isSearching ? filteredTasks[indexPath.row] : viewModel.tasks[indexPath.row]
         cell.configure(with: task)
+        cell.selectionStyle = .none
         
         cell.onCompletionToggled = { [weak self] newCompletionStatus in
             guard let self = self else {
