@@ -35,7 +35,7 @@ final class ToDoListFooterView: UIView {
     
     private lazy var separatorView: UIView = {
         let view = UIView()
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(resource: .footerSeparator)
         
         return view
     }()
@@ -54,7 +54,7 @@ final class ToDoListFooterView: UIView {
     }
     
     private func setupView() {
-        backgroundColor = .darkGray
+        backgroundColor = UIColor(resource: .footerBackground)
         [
             separatorView,
             taskCountLabel,

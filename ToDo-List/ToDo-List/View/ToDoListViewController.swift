@@ -58,7 +58,7 @@ final class ToDoListViewController: UIViewController {
     
     private lazy var homeIndicatorBackgroundView: UIView = {
         let view = UIView()
-        view.backgroundColor = .darkGray // Цвет фона области Home Indicator
+        view.backgroundColor = UIColor(resource: .footerBackground) // Цвет фона области Home Indicator
         
         return view
     }()
